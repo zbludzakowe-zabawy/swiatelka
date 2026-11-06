@@ -4,9 +4,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { _electron as electron } from 'playwright';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
+// path.resolve usuwa końcowy „\”, który na Windows psuje cudzysłowy w argumentach.
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const exe = process.env.SWIATELKA_EXE; // opcjonalnie: zbudowana aplikacja zamiast `electron .`
 
 test('gra działa w aplikacji na komputer bez internetu', async () => {
