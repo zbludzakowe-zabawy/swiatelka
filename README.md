@@ -4,6 +4,8 @@
 
 Gra w wygaszanie światełek na planszy 5×5. Przejdź 10 coraz trudniejszych plansz.
 
+**Zagraj online:** <https://zbludzakowe-zabawy.github.io/swiatelka/>
+
 ## Jak grać
 
 1. Na planszy 5×5 część lampek świeci.
@@ -35,7 +37,10 @@ npm start
 ```
 
 i otwórz <http://localhost:8000> w przeglądarce. Zamiast `npm start` można użyć dowolnego
-serwera plików statycznych, np. GitHub Pages.
+serwera plików statycznych.
+
+Każda zmiana w gałęzi `main` jest automatycznie testowana i publikowana na GitHub Pages
+(workflow `.github/workflows/pages.yml`).
 
 ## Testy
 
