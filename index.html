@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Gra w światełka</title>
+  <meta name="theme-color" content="#12151a">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="panel">
+  <header>
+    <h1>Gra w światełka</h1>
+    <div class="level" id="level">Plansza 1 / 10</div>
+  </header>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <div class="stats">
+    <div class="stat"><span>Ruchy</span><b id="moves">0</b></div>
+    <div class="stat"><span>Zapalone</span><b id="lit">0</b></div>
+  </div>
+  <div class="grid board" id="board" role="grid" aria-label="Plansza 5 na 5"></div>
+  <p class="msg" id="msg" aria-live="polite">Zgaś wszystkie światła.</p>
+  <div class="actions">
+    <button class="btn" id="undo" type="button">Cofnij ruch</button>
+    <button class="btn" id="reset" type="button">Od nowa tę planszę</button>
+    <button class="btn go" id="next" type="button" hidden>Następna plansza</button>
+    <button class="btn primary" id="restart" type="button" hidden>Zagraj ponownie</button>
+    <button class="btn" id="newgame" type="button">Nowa gra</button>
+  </div>
+  <p class="rules">Kliknięcie kafelka zmienia jego stan oraz stan sąsiadów: z góry, z dołu, z lewej i z prawej. Planszę przechodzisz, gdy wszystkie kafelki są w stanie 0. Przejdź 10 plansz, aby wygrać grę.</p>
+</main>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

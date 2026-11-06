@@ -1,0 +1,13 @@
+{
+  "name": "swiatelka",
+  "version": "1.0.0",
+  "description": "Gra w wygaszanie światełek na planszy 5×5",
+  "type": "module",
+  "private": true,
+  "license": "BSD-2-Clause",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "test": "node --test tests/*.test.js",
+    "icons": "node scripts/make-icons.js"
+  }
+}
