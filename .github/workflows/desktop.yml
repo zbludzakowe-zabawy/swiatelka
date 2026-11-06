@@ -34,9 +34,12 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - run: npm test
-      - name: Test aplikacji bez internetu
+      - name: Test aplikacji bez internetu (Linux)
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:desktop
+      - name: Test aplikacji bez internetu
+        if: runner.os != 'Linux'
+        run: npm run test:desktop
       - name: Zbuduj instalatory
         run: npx electron-builder ${{ matrix.target }} --publish never
         env:

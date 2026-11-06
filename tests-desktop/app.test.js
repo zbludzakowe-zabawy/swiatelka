@@ -3,9 +3,10 @@
 // Uruchomienie: npm run test:desktop  (wymaga Playwright: npm i -D playwright)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import { _electron as electron } from 'playwright';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 const exe = process.env.SWIATELKA_EXE; // opcjonalnie: zbudowana aplikacja zamiast `electron .`
 
 test('gra działa w aplikacji na komputer bez internetu', async () => {
