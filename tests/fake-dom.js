@@ -4,6 +4,7 @@ class ClassList {
   toggle(c, force) { const on = force ?? !this.set.has(c); on ? this.set.add(c) : this.set.delete(c); return on; }
   contains(c) { return this.set.has(c); }
   add(c) { this.set.add(c); }
+  remove(c) { this.set.delete(c); }
 }
 export class FakeElement {
   constructor(doc, tag) {

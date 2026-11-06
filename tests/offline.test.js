@@ -14,14 +14,17 @@ const pageFiles = ['index.html', 'manifest.webmanifest', ...list('css'), ...list
 const swFiles = [...read('sw.js').matchAll(/^\s*'([^']+)',$/gm)].map(m => m[1]);
 
 test('strona nie wczytuje niczego z internetu', () => {
+  // Jedyny wyjątek: link do pobrania aplikacji (nie jest wczytywany przez stronę).
+  const APK = /'https:\/\/github\.com\/zbludzakowe-zabawy\/swiatelka\/releases\/latest\/download\/[\w.-]+\.apk'/;
   for (const f of pageFiles) {
-    assert.doesNotMatch(read(f), /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\//i, f);
+    const text = f === 'src/install.js' ? read(f).replace(APK, '') : read(f);
+    assert.doesNotMatch(text, /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\//i, f);
   }
 });
 
 test('wszystkie pliki, do których odwołuje się strona, istnieją', () => {
   const refs = [
-    ...[...read('index.html').matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]),
+    ...[...read('index.html').matchAll(/(?:href|src)="([^"#][^"]*)"/g)].map(m => m[1]),
     ...[...read('css/fonts.css').matchAll(/url\(\.\.\/([^)]+)\)/g)].map(m => m[1]),
     ...JSON.parse(read('manifest.webmanifest')).icons.map(i => i.src),
   ];

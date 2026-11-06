@@ -52,14 +52,15 @@ jobs:
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$ANDROID_KEYSTORE_FILE"
           ./gradlew --no-daemon assembleRelease
 
+      # Stała nazwa (bez numeru wersji): strona gry na telefonie linkuje do
+      # releases/latest/download/Swiatelka-android.apk — zawsze najnowsze wydanie.
       - name: Nazwij plik APK
         run: |
-          VERSION=$(node -p "require('./package.json').version")
           mkdir -p out
           if [ "$HAS_KEY" = "true" ]; then
-            cp android/app/build/outputs/apk/release/app-release.apk "out/Swiatelka-$VERSION-android.apk"
+            cp android/app/build/outputs/apk/release/app-release.apk out/Swiatelka-android.apk
           else
-            cp android/app/build/outputs/apk/debug/app-debug.apk "out/Swiatelka-$VERSION-android.apk"
+            cp android/app/build/outputs/apk/debug/app-debug.apk out/Swiatelka-android.apk
           fi
 
       - name: Włącz KVM (przyspieszenie emulatora)

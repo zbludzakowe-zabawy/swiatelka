@@ -89,3 +89,32 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   .panel { padding: 16px; gap: 14px; }
   .actions button.btn { padding: 12px 10px; flex-basis: 110px; }
 }
+
+/* Pasek z propozycją aplikacji (tylko w przeglądarce na telefonie) */
+.install {
+  position: fixed; z-index: 10;
+  left: max(10px, var(--sa-left)); right: max(10px, var(--sa-right));
+  bottom: max(10px, var(--sa-bottom));
+  max-width: 440px; margin: 0 auto; box-sizing: border-box;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border-radius: 14px;
+  background: #232a35; border: 1px solid var(--line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+}
+.install img { width: 44px; height: 44px; border-radius: 10px; flex: none; }
+.install-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: .85rem; color: var(--muted); line-height: 1.35; }
+.install-text > b { font-family: var(--f-display); font-size: 1rem; color: var(--fg); }
+.install-text span b { color: var(--fg); font-weight: 500; }
+.install .share { vertical-align: -3px; color: var(--fg); }
+.install a.btn {
+  flex: none; text-decoration: none; font: 500 .95rem var(--f-body); padding: 10px 16px;
+  border-radius: 8px; background: var(--lamp-on); color: #2a1d00;
+}
+.install-close {
+  flex: none; align-self: flex-start; width: 32px; height: 32px; margin: -6px -6px 0 0;
+  border: 0; border-radius: 8px; background: transparent; color: var(--muted);
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
+}
+.install a.btn:focus-visible, .install-close:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+/* Miejsce pod paskiem, żeby nie zasłaniał przycisków gry. */
+body.has-install { padding-bottom: calc(120px + var(--sa-bottom)); }

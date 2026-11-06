@@ -1,7 +1,7 @@
 // Service worker: zapisuje pliki gry w pamięci przeglądarki, żeby wersja z przeglądarki
 // (także „zainstalowana” jako aplikacja) działała bez internetu.
 // Po zmianie któregoś pliku zwiększ numer wersji, by gracze dostali nowe pliki.
-const CACHE = 'swiatelka-v2';
+const CACHE = 'swiatelka-v3';
 const FILES = [
   './',
   'index.html',
@@ -14,6 +14,7 @@ const FILES = [
   'src/board.js',
   'src/colors.js',
   'src/messages.js',
+  'src/install.js',
   'icons/icon.svg',
   'icons/favicon-32.png',
   'icons/icon-180.png',

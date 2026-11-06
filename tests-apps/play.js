@@ -2,8 +2,10 @@
 // czcionki są lokalne, ruch i cofanie działają, plansza 1 daje się rozwiązać.
 import assert from 'node:assert/strict';
 
-export async function playFirstLevel(win) {
+export async function playFirstLevel(win, { inApp = true } = {}) {
   await win.waitForSelector('#board .tile');
+  // W zainstalowanej aplikacji nie proponujemy instalacji aplikacji.
+  if (inApp) assert.ok(await win.isHidden('#install'), 'w aplikacji widać propozycję instalacji');
   assert.equal(await win.title(), 'Gra w światełka');
   assert.equal(await win.locator('#board .tile').count(), 25);
   assert.equal(await win.textContent('#level'), 'Plansza 1 / 10');

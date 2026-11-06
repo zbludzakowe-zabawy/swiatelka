@@ -37,6 +37,11 @@ jobs:
       - name: Test aplikacji bez internetu (Linux)
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:desktop
+      - name: Test strony na telefonach (przeglądarka)
+        if: runner.os == 'Linux'
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:web
       - name: Test aplikacji bez internetu
         if: runner.os != 'Linux'
         run: npm run test:desktop

@@ -36,12 +36,16 @@ Gra otwarta w przeglądarce też działa bez internetu po pierwszym wczytaniu
 
 ## Wersja na telefon (bez internetu)
 
-**Android:** pobierz plik `Swiatelka-…-android.apk` z zakładki
-[**Releases**](https://github.com/zbludzakowe-zabawy/swiatelka/releases) i otwórz go na telefonie.
+Wystarczy otworzyć <https://zbludzakowe-zabawy.github.io/swiatelka/> na telefonie — na dole
+pojawi się propozycja instalacji (do ukrycia przyciskiem ×; wraca po tygodniu).
+
+**Android:** stuknij **Pobierz** w propozycji na stronie gry (albo pobierz plik
+`Swiatelka-android.apk` z zakładki [**Releases**](https://github.com/zbludzakowe-zabawy/swiatelka/releases))
+i otwórz go na telefonie.
 Telefon zapyta o zgodę na instalację aplikacji „z nieznanego źródła” — zezwól przeglądarce
 lub menedżerowi plików. Aplikacja **nie ma nawet uprawnienia do internetu**.
 
-**iPhone / iPad:** otwórz <https://zbludzakowe-zabawy.github.io/swiatelka/> w Safari, stuknij
+**iPhone / iPad:** otwórz stronę gry w Safari i — jak podpowiada pasek na dole — stuknij
 *Udostępnij* → *Do ekranu początkowego*. Gra dostanie własną ikonę, otworzy się na pełnym
 ekranie i po pierwszym otwarciu będzie działać bez internetu.
 (Ten sam sposób działa na Androidzie w Chrome: menu ⋮ → *Zainstaluj aplikację*.)
@@ -139,6 +143,9 @@ rozwiązuje planszę i sprawdza, że aplikacja nie łączy się z siecią
 npm run test:desktop
 ```
 
+Test strony w przeglądarce (`npm run test:web`) emuluje Androida, iPhone’a i komputer:
+sprawdza propozycję instalacji aplikacji, przycisk „Nie teraz” i grę bez internetu.
+
 Test na Androida (`npm run test:android`) wymaga emulatora lub telefonu podłączonego przez
 `adb` z zainstalowaną wersją debug. Włącza tryb samolotowy, sprawdza, że aplikacja nie ma
 uprawnienia do internetu, i przechodzi planszę 1. W GitHub Actions uruchamia się w emulatorze
@@ -154,6 +161,7 @@ src/game.js           stan rozgrywki: poziomy, ruchy, cofanie, reset
 src/colors.js         kolory światełek dla kolejnych plansz
 src/messages.js       komunikaty dla gracza
 src/ui.js             obsługa widoku (DOM)
+src/install.js        propozycja instalacji aplikacji na telefonie
 src/main.js           punkt startowy
 tests/                testy (node:test)
 sw.js                 service worker — gra w przeglądarce działa bez internetu
