@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Światełka</string>
+    <string name="title_activity_main">Światełka</string>
+    <string name="package_name">io.github.zbludzakowe_zabawy.swiatelka</string>
+    <string name="custom_url_scheme">io.github.zbludzakowe_zabawy.swiatelka</string>
+</resources>

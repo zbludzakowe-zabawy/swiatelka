@@ -1,0 +1,95 @@
+name: Aplikacja na Androida
+# Buduje plik APK z grą i testuje go w emulatorze telefonu w trybie samolotowym.
+# - przy każdym wypchnięciu zmian: APK do pobrania w zakładce Actions (Artifacts),
+# - po wypchnięciu tagu v* (np. v1.1.0): APK dołączony do wydania w zakładce Releases.
+# Jeśli w repozytorium są sekrety ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+# ANDROID_KEY_ALIAS i ANDROID_KEY_PASSWORD, APK jest podpisany stałym kluczem (zob. README).
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - run: npm test
+      - name: Przygotuj projekt Androida
+        run: npm run android
+
+      - name: Zbuduj APK (debug — do testu)
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Zbuduj APK (release, podpisany)
+        if: env.HAS_KEY == 'true'
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/swiatelka.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$ANDROID_KEYSTORE_FILE"
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Nazwij plik APK
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir -p out
+          if [ "$HAS_KEY" = "true" ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk "out/Swiatelka-$VERSION-android.apk"
+          else
+            cp android/app/build/outputs/apk/debug/app-debug.apk "out/Swiatelka-$VERSION-android.apk"
+          fi
+
+      - name: Włącz KVM (przyspieszenie emulatora)
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Test w emulatorze telefonu (tryb samolotowy)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -noaudio -no-boot-anim -gpu swiftshader_indirect
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            SCREENSHOT=out/zrzut-ekranu-android.png npm run test:android
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: swiatelka-Android
+          path: out/
+          if-no-files-found: error
+
+      - name: Dołącz APK do wydania
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.apk

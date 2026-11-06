@@ -34,6 +34,21 @@ trafiają do nowego wydania w *Releases*.
 Gra otwarta w przeglądarce też działa bez internetu po pierwszym wczytaniu
 (service worker `sw.js`), a w Chrome/Edge można ją zainstalować ikoną „Zainstaluj” w pasku adresu.
 
+## Wersja na telefon (bez internetu)
+
+**Android:** pobierz plik `Swiatelka-…-android.apk` z zakładki
+[**Releases**](https://github.com/zbludzakowe-zabawy/swiatelka/releases) i otwórz go na telefonie.
+Telefon zapyta o zgodę na instalację aplikacji „z nieznanego źródła” — zezwól przeglądarce
+lub menedżerowi plików. Aplikacja **nie ma nawet uprawnienia do internetu**.
+
+**iPhone / iPad:** otwórz <https://zbludzakowe-zabawy.github.io/swiatelka/> w Safari, stuknij
+*Udostępnij* → *Do ekranu początkowego*. Gra dostanie własną ikonę, otworzy się na pełnym
+ekranie i po pierwszym otwarciu będzie działać bez internetu.
+(Ten sam sposób działa na Androidzie w Chrome: menu ⋮ → *Zainstaluj aplikację*.)
+
+Aplikacji na iPhone’a nie da się rozdawać jako pliku — wymaga to konta Apple Developer
+(płatnego) i publikacji w App Store, dlatego dla iPhone’a jest wersja z przeglądarki.
+
 ## Jak grać
 
 1. Na planszy 5×5 część lampek świeci.
@@ -81,6 +96,33 @@ npm run dist         # buduje instalator dla bieżącego systemu (do katalogu di
 `npm run dist:win`, `dist:mac`, `dist:linux` budują dla konkretnego systemu
 (Windows najłatwiej budować na Windows, macOS — na macOS).
 
+### Aplikacja na Androida ze źródeł
+
+Projekt Androida (Capacitor) jest w katalogu `android/`. Potrzebne: Android Studio
+(lub Android SDK) i Java 21.
+
+```bash
+npm install
+npm run android         # kopiuje grę do www/ i aktualizuje projekt android/
+npm run android:open    # otwiera projekt w Android Studio
+```
+
+albo bez Android Studio: `cd android && ./gradlew assembleDebug` — plik APK pojawi się w
+`android/app/build/outputs/apk/debug/`. Ikony aplikacji generuje `npm run icons`.
+
+APK budowany w GitHub Actions (`.github/workflows/android.yml`) jest podpisany kluczem
+testowym, który zmienia się przy każdym budowaniu — przed instalacją nowszej wersji trzeba
+odinstalować starą. Aby podpisywać stałym kluczem, utwórz go raz:
+
+```bash
+keytool -genkeypair -v -keystore swiatelka.jks -alias swiatelka -keyalg RSA -keysize 4096 -validity 10000
+```
+
+i dodaj w *Settings → Secrets and variables → Actions* sekrety: `ANDROID_KEYSTORE_BASE64`
+(wynik `base64 -w0 swiatelka.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`
+(`swiatelka`) i `ANDROID_KEY_PASSWORD`. Pliku `.jks` nie dodawaj do repozytorium i nie zgub go
+— bez niego nie da się wydać aktualizacji.
+
 ## Testy
 
 Wymagany Node.js 18+ (bez dodatkowych pakietów):
@@ -89,13 +131,18 @@ Wymagany Node.js 18+ (bez dodatkowych pakietów):
 npm test
 ```
 
-Test aplikacji na komputer uruchamia prawdziwe okno gry z zablokowanym internetem,
+Testy aplikacji (`tests-apps/`). Test na komputer uruchamia prawdziwe okno gry z zablokowanym internetem,
 rozwiązuje planszę i sprawdza, że aplikacja nie łączy się z siecią
 (na Linuksie bez ekranu: `xvfb-run -a npm run test:desktop`):
 
 ```bash
 npm run test:desktop
 ```
+
+Test na Androida (`npm run test:android`) wymaga emulatora lub telefonu podłączonego przez
+`adb` z zainstalowaną wersją debug. Włącza tryb samolotowy, sprawdza, że aplikacja nie ma
+uprawnienia do internetu, i przechodzi planszę 1. W GitHub Actions uruchamia się w emulatorze
+przy każdej zmianie.
 
 ## Struktura projektu
 
@@ -112,7 +159,10 @@ tests/                testy (node:test)
 sw.js                 service worker — gra w przeglądarce działa bez internetu
 fonts/                czcionki dołączone lokalnie (SIL OFL 1.1)
 desktop/main.cjs      aplikacja na komputer (Electron)
-tests-desktop/        test aplikacji na komputer: npm run test:desktop
+android/              aplikacja na Androida (Capacitor)
+capacitor.config.json ustawienia aplikacji na Androida
+scripts/build-web.js  kopiuje pliki gry do www/ (dla Androida)
+tests-apps/           testy aplikacji: npm run test:desktop, npm run test:android
 icons/                ikona gry (SVG + PNG)
 scripts/make-icons.js generator ikon: npm run icons
 ```

@@ -44,3 +44,11 @@ test('aplikacja na komputer zawiera wszystkie pliki gry', () => {
   }
   assert.equal(pkg.main, 'desktop/main.cjs');
 });
+
+test('aplikacja na Androida nie prosi o dostęp do internetu', () => {
+  const manifest = read('android/app/src/main/AndroidManifest.xml');
+  assert.doesNotMatch(manifest, /android\.permission\.INTERNET/);
+  const cap = JSON.parse(read('capacitor.config.json'));
+  assert.equal(cap.webDir, 'www');
+  assert.equal(cap.server, undefined, 'aplikacja ma wczytywać grę z plików, nie z serwera');
+});
