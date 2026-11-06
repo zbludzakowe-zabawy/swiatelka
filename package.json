@@ -1,13 +1,128 @@
 {
   "name": "swiatelka",
+  "productName": "Gra w światełka",
   "version": "1.0.0",
   "description": "Gra w wygaszanie światełek na planszy 5×5",
   "type": "module",
   "private": true,
   "license": "BSD-2-Clause",
+  "author": "zbludzakowe-zabawy",
+  "homepage": "https://zbludzakowe-zabawy.github.io/swiatelka/",
+  "main": "desktop/main.cjs",
   "scripts": {
     "start": "python3 -m http.server 8000",
     "test": "node --test tests/*.test.js",
-    "icons": "node scripts/make-icons.js"
+    "icons": "node scripts/make-icons.js",
+    "desktop": "electron .",
+    "test:desktop": "node --test tests-apps/desktop.test.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux",
+    "build:web": "node scripts/build-web.js",
+    "android": "npm run build:web && cap sync android",
+    "android:open": "cap open android",
+    "test:android": "node --test tests-apps/android.test.js",
+    "test:web": "node --test tests-apps/web.test.js"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "electron": "45.2.3",
+    "electron-builder": "26.0.12",
+    "playwright": "^1.63.0"
+  },
+  "build": {
+    "appId": "io.github.zbludzakowe-zabawy.swiatelka",
+    "productName": "Gra w światełka",
+    "executableName": "swiatelka",
+    "artifactName": "Swiatelka-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "icons"
+    },
+    "files": [
+      "index.html",
+      "manifest.webmanifest",
+      "css/**",
+      "src/**",
+      "fonts/**",
+      "icons/**",
+      "desktop/**",
+      "LICENSE"
+    ],
+    "icon": "icons/icon-512.png",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Gra w światełka",
+      "installerLanguages": [
+        "pl_PL"
+      ],
+      "language": "1045",
+      "artifactName": "Swiatelka-${version}-instalator-windows.${ext}"
+    },
+    "portable": {
+      "artifactName": "Swiatelka-${version}-windows-bez-instalacji.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.puzzle-games"
+    },
+    "dmg": {
+      "artifactName": "Swiatelka-${version}-macos.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Game",
+      "maintainer": "zbludzakowe-zabawy",
+      "synopsis": "Gra w wygaszanie światełek na planszy 5×5"
+    },
+    "appImage": {
+      "artifactName": "Swiatelka-${version}-linux-x86_64.${ext}"
+    },
+    "deb": {
+      "artifactName": "swiatelka_${version}_amd64.${ext}"
+    }
   }
 }

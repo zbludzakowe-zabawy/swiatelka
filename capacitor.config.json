@@ -1,0 +1,12 @@
+{
+  "appId": "io.github.zbludzakowe_zabawy.swiatelka",
+  "appName": "Światełka",
+  "webDir": "www",
+  "backgroundColor": "#12151a",
+  "plugins": {
+    "SystemBars": {
+      "style": "DARK",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}
