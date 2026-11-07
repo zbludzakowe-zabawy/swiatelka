@@ -14,11 +14,8 @@ const pageFiles = ['index.html', 'manifest.webmanifest', ...list('css'), ...list
 const swFiles = [...read('sw.js').matchAll(/^\s*'([^']+)',$/gm)].map(m => m[1]);
 
 test('strona nie wczytuje niczego z internetu', () => {
-  // Jedyny wyjątek: link do pobrania aplikacji (nie jest wczytywany przez stronę).
-  const APK = /'https:\/\/github\.com\/zbludzakowe-zabawy\/swiatelka\/releases\/latest\/download\/[\w.-]+\.apk'/;
   for (const f of pageFiles) {
-    const text = f === 'src/install.js' ? read(f).replace(APK, '') : read(f);
-    assert.doesNotMatch(text, /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\//i, f);
+    assert.doesNotMatch(read(f), /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\//i, f);
   }
 });
 
@@ -46,12 +43,4 @@ test('aplikacja na komputer zawiera wszystkie pliki gry', () => {
     assert.ok(files.includes(entry), `brak w build.files: ${entry}`);
   }
   assert.equal(pkg.main, 'desktop/main.cjs');
-});
-
-test('aplikacja na Androida nie prosi o dostęp do internetu', () => {
-  const manifest = read('android/app/src/main/AndroidManifest.xml');
-  assert.doesNotMatch(manifest, /android\.permission\.INTERNET/);
-  const cap = JSON.parse(read('capacitor.config.json'));
-  assert.equal(cap.webDir, 'www');
-  assert.equal(cap.server, undefined, 'aplikacja ma wczytywać grę z plików, nie z serwera');
 });

@@ -32,26 +32,27 @@ a po wypchnięciu tagu, np. `git tag v1.0.0 && git push origin v1.0.0`,
 trafiają do nowego wydania w *Releases*.
 
 Gra otwarta w przeglądarce też działa bez internetu po pierwszym wczytaniu
-(service worker `sw.js`), a w Chrome/Edge można ją zainstalować ikoną „Zainstaluj” w pasku adresu.
+(service worker `sw.js`), a w Chrome/Edge można ją zainstalować przyciskiem **Zainstaluj**
+(jak na telefonie, patrz niżej).
 
-## Wersja na telefon (bez internetu)
+## Wersja na telefon (aplikacja z przeglądarki, bez internetu)
 
-Wystarczy otworzyć <https://zbludzakowe-zabawy.github.io/swiatelka/> na telefonie — na dole
-pojawi się propozycja instalacji (do ukrycia przyciskiem ×; wraca po tygodniu).
+Na telefon gra instaluje się prosto ze strony jako aplikacja (PWA) — bez pobierania plików,
+bez zgody na „nieznane źródła” i bez sklepu. Otwórz <https://zbludzakowe-zabawy.github.io/swiatelka/>:
 
-**Android:** stuknij **Pobierz** w propozycji na stronie gry (albo pobierz plik
-`Swiatelka-android.apk` z zakładki [**Releases**](https://github.com/zbludzakowe-zabawy/swiatelka/releases))
-i otwórz go na telefonie.
-Telefon zapyta o zgodę na instalację aplikacji „z nieznanego źródła” — zezwól przeglądarce
-lub menedżerowi plików. Aplikacja **nie ma nawet uprawnienia do internetu**.
+**Android (Chrome, Edge, Samsung Internet):** na dole pojawi się pasek *Zagraj w aplikacji* —
+stuknij **Zainstaluj** i potwierdź. (Jeśli paska nie ma: menu ⋮ → *Zainstaluj aplikację*
+lub *Dodaj do ekranu głównego*.)
 
-**iPhone / iPad:** otwórz stronę gry w Safari i — jak podpowiada pasek na dole — stuknij
-*Udostępnij* → *Do ekranu początkowego*. Gra dostanie własną ikonę, otworzy się na pełnym
-ekranie i po pierwszym otwarciu będzie działać bez internetu.
-(Ten sam sposób działa na Androidzie w Chrome: menu ⋮ → *Zainstaluj aplikację*.)
+**iPhone / iPad (Safari):** jak podpowiada pasek na dole, stuknij *Udostępnij* →
+*Do ekranu początkowego*.
 
-Aplikacji na iPhone’a nie da się rozdawać jako pliku — wymaga to konta Apple Developer
-(płatnego) i publikacji w App Store, dlatego dla iPhone’a jest wersja z przeglądarki.
+Gra dostaje własną ikonę, otwiera się na pełnym ekranie i po pierwszym otwarciu działa
+**bez internetu**. Pasek propozycji można ukryć przyciskiem × (wraca po tygodniu).
+
+**Aktualizacje:** po opublikowaniu nowej wersji zainstalowana gra pokaże pasek
+*Dostępna nowa wersja* — **Odśwież** włącza ją od razu, **Później** zostawia obecną
+(nowa włączy się sama przy następnym uruchomieniu gry).
 
 ## Jak grać
 
@@ -83,11 +84,13 @@ Moduły ES wymagają serwera (otwarcie pliku `index.html` z dysku nie zadziała)
 npm start
 ```
 
-i otwórz <http://localhost:8000> w przeglądarce. Zamiast `npm start` można użyć dowolnego
-serwera plików statycznych.
+i otwórz <http://localhost:8000> w przeglądarce. `npm start` buduje stronę do katalogu `_site/`
+(`npm run build`, czyli `scripts/build-site.js`) i ją serwuje — po zmianie plików uruchom go ponownie.
 
 Każda zmiana w gałęzi `main` jest automatycznie testowana i publikowana na GitHub Pages
-(workflow `.github/workflows/pages.yml`).
+(workflow `.github/workflows/pages.yml`). Przy publikacji `scripts/build-site.js` wpisuje do
+`sw.js` wersję — skrót zawartości wszystkich plików — więc każda zmiana gry to nowa wersja,
+którą gracze dostają przez pasek *Dostępna nowa wersja*.
 
 ### Aplikacja na komputer ze źródeł
 
@@ -99,33 +102,6 @@ npm run dist         # buduje instalator dla bieżącego systemu (do katalogu di
 
 `npm run dist:win`, `dist:mac`, `dist:linux` budują dla konkretnego systemu
 (Windows najłatwiej budować na Windows, macOS — na macOS).
-
-### Aplikacja na Androida ze źródeł
-
-Projekt Androida (Capacitor) jest w katalogu `android/`. Potrzebne: Android Studio
-(lub Android SDK) i Java 21.
-
-```bash
-npm install
-npm run android         # kopiuje grę do www/ i aktualizuje projekt android/
-npm run android:open    # otwiera projekt w Android Studio
-```
-
-albo bez Android Studio: `cd android && ./gradlew assembleDebug` — plik APK pojawi się w
-`android/app/build/outputs/apk/debug/`. Ikony aplikacji generuje `npm run icons`.
-
-APK budowany w GitHub Actions (`.github/workflows/android.yml`) jest podpisany kluczem
-testowym, który zmienia się przy każdym budowaniu — przed instalacją nowszej wersji trzeba
-odinstalować starą. Aby podpisywać stałym kluczem, utwórz go raz:
-
-```bash
-keytool -genkeypair -v -keystore swiatelka.jks -alias swiatelka -keyalg RSA -keysize 4096 -validity 10000
-```
-
-i dodaj w *Settings → Secrets and variables → Actions* sekrety: `ANDROID_KEYSTORE_BASE64`
-(wynik `base64 -w0 swiatelka.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`
-(`swiatelka`) i `ANDROID_KEY_PASSWORD`. Pliku `.jks` nie dodawaj do repozytorium i nie zgub go
-— bez niego nie da się wydać aktualizacji.
 
 ## Testy
 
@@ -144,12 +120,8 @@ npm run test:desktop
 ```
 
 Test strony w przeglądarce (`npm run test:web`) emuluje Androida, iPhone’a i komputer:
-sprawdza propozycję instalacji aplikacji, przycisk „Nie teraz” i grę bez internetu.
-
-Test na Androida (`npm run test:android`) wymaga emulatora lub telefonu podłączonego przez
-`adb` z zainstalowaną wersją debug. Włącza tryb samolotowy, sprawdza, że aplikacja nie ma
-uprawnienia do internetu, i przechodzi planszę 1. W GitHub Actions uruchamia się w emulatorze
-przy każdej zmianie.
+sprawdza propozycję instalacji (przycisk *Zainstaluj*, podpowiedź dla iPhone’a, „Nie teraz”),
+grę bez internetu i pasek *Dostępna nowa wersja*.
 
 ## Struktura projektu
 
@@ -161,16 +133,15 @@ src/game.js           stan rozgrywki: poziomy, ruchy, cofanie, reset
 src/colors.js         kolory światełek dla kolejnych plansz
 src/messages.js       komunikaty dla gracza
 src/ui.js             obsługa widoku (DOM)
-src/install.js        propozycja instalacji aplikacji na telefonie
+src/pwa.js            instalacja gry ze strony (PWA) i pasek „Dostępna nowa wersja”
 src/main.js           punkt startowy
 tests/                testy (node:test)
 sw.js                 service worker — gra w przeglądarce działa bez internetu
 fonts/                czcionki dołączone lokalnie (SIL OFL 1.1)
 desktop/main.cjs      aplikacja na komputer (Electron)
-android/              aplikacja na Androida (Capacitor)
-capacitor.config.json ustawienia aplikacji na Androida
-scripts/build-web.js  kopiuje pliki gry do www/ (dla Androida)
-tests-apps/           testy aplikacji: npm run test:desktop, npm run test:android
+scripts/build-site.js strona do publikacji w _site/ (z wersją w sw.js)
+manifest.webmanifest  opis aplikacji (nazwa, ikony) do instalacji ze strony
+tests-apps/           testy aplikacji: npm run test:desktop, npm run test:web
 icons/                ikona gry (SVG + PNG)
 scripts/make-icons.js generator ikon: npm run icons
 ```

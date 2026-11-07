@@ -1,5 +1,5 @@
 name: Wydanie
-# Po każdej zmianie na main buduje i testuje aplikacje (komputer + Android).
+# Po każdej zmianie na main buduje i testuje aplikacje na komputer (Windows, macOS, Linux).
 # Jeśli wersji z package.json (np. 1.0.0) nie ma jeszcze w zakładce Releases,
 # publikuje wydanie v1.0.0 ze wszystkimi plikami do pobrania.
 # Nowe wydanie = podnieś "version" w package.json i scal zmianę do main.
@@ -40,14 +40,8 @@ jobs:
     permissions:
       contents: read
 
-  android:
-    uses: ./.github/workflows/android.yml
-    permissions:
-      contents: read
-    secrets: inherit
-
   publish:
-    needs: [version, desktop, android]
+    needs: [version, desktop]
     if: needs.version.outputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -59,7 +53,6 @@ jobs:
           merge-multiple: true
       - name: Lista plików wydania
         run: |
-          rm -f dist/*.png
           ls -la dist
       - uses: softprops/action-gh-release@v2
         with:
@@ -73,7 +66,6 @@ jobs:
             dist/*.dmg
             dist/*.AppImage
             dist/*.deb
-            dist/*.apk
           body: |
             Gra w wygaszanie światełek — działa bez internetu.
 
@@ -82,7 +74,7 @@ jobs:
             | Windows | `Swiatelka-${{ needs.version.outputs.version }}-instalator-windows.exe` (lub wersja bez instalacji) |
             | macOS | `Swiatelka-${{ needs.version.outputs.version }}-macos.dmg` |
             | Linux | `Swiatelka-${{ needs.version.outputs.version }}-linux-x86_64.AppImage` lub `.deb` |
-            | Android | `Swiatelka-android.apk` |
+            | Android | otwórz https://zbludzakowe-zabawy.github.io/swiatelka/ w Chrome → **Zainstaluj** |
             | iPhone / iPad | otwórz https://zbludzakowe-zabawy.github.io/swiatelka/ w Safari → Udostępnij → Do ekranu początkowego |
 
             Instrukcja instalacji: zobacz README.
