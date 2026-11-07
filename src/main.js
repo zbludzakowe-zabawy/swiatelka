@@ -1,12 +1,13 @@
 import { Game } from './game.js';
 import { createUI } from './ui.js';
-import { isApp, setupInstall } from './install.js';
+import { setupInstall, setupUpdates } from './pwa.js';
 
 createUI(new Game());
 
-if (!isApp()) {
-  // Gra w przeglądarce: na telefonie zaproponuj aplikację…
+// Gra z przeglądarki (także zainstalowana jako aplikacja, PWA): pliki w pamięci, żeby działała
+// bez internetu, pasek „Dostępna nowa wersja” i — dopóki nie jest zainstalowana — propozycja
+// instalacji. W aplikacji na komputer (app://) niczego z tego nie trzeba.
+if (location.protocol.startsWith('http')) {
+  setupUpdates();
   setupInstall();
-  // …i zapamiętaj pliki, żeby działała też bez internetu.
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 }

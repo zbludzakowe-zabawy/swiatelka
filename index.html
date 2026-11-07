@@ -38,17 +38,28 @@
   </div>
   <p class="rules">Kliknięcie kafelka zmienia jego stan oraz stan sąsiadów: z góry, z dołu, z lewej i z prawej. Planszę przechodzisz, gdy wszystkie kafelki są w stanie 0. Przejdź 10 plansz, aby wygrać grę.</p>
 </main>
-<aside class="install" id="install" aria-label="Aplikacja na telefon" hidden>
+<aside class="install" id="install" aria-label="Aplikacja" hidden>
   <img src="icons/icon-192.png" alt="" width="44" height="44">
   <div class="install-text">
     <b>Zagraj w aplikacji</b>
-    <span id="install-desc">Działa bez internetu.</span>
+    <span id="install-desc">Własna ikona, pełny ekran i gra bez internetu.</span>
     <span id="install-ios" hidden>Stuknij
       <svg class="share" viewBox="0 0 24 24" width="16" height="16" aria-label="Udostępnij" role="img"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <b>Udostępnij</b>, a potem <b>Do ekranu początkowego</b>.</span>
   </div>
-  <a class="btn primary" id="install-get" href="#" hidden>Pobierz</a>
+  <button class="btn primary" id="install-get" type="button" hidden>Zainstaluj</button>
   <button class="install-close" id="install-close" type="button" aria-label="Nie teraz">×</button>
+</aside>
+<aside class="install" id="update" aria-label="Nowa wersja" aria-live="polite" hidden>
+  <img src="icons/icon-192.png" alt="" width="44" height="44">
+  <div class="install-text">
+    <b>Dostępna nowa wersja</b>
+    <span>Odświeżenie zacznie grę od nowa.</span>
+  </div>
+  <div class="install-actions">
+    <button class="btn secondary" id="update-later" type="button">Później</button>
+    <button class="btn primary" id="update-now" type="button">Odśwież</button>
+  </div>
 </aside>
 <script type="module" src="src/main.js"></script>
 </body>

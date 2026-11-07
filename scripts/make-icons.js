@@ -1,17 +1,15 @@
-// Generuje icons/icon.svg oraz pliki PNG (favicon, apple-touch, 192, 512, maskable)
-// i — jeśli istnieje katalog android/ — ikony aplikacji na Androida.
+// Generuje icons/icon.svg oraz pliki PNG (favicon, apple-touch, 192, 512, maskable).
 // Użycie: npm run icons   (PNG wymagają zainstalowanego pakietu playwright z Chromium)
-import { writeFileSync, existsSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 // Wzór zapalonych lamp na ikonie: krzyżyk w środku + pojedyncze światła.
 const LIT = new Set([23, 32, 33, 34, 43, 11, 55, 15]);
 
 // mode: 'icon' — zaokrąglony kafel; 'full' — tło na całą powierzchnię, lampy w strefie
-// bezpiecznej (ikony „maskable” i Android); 'fg' — same lampy na przezroczystym tle
-// (pierwszy plan ikony adaptacyjnej Androida, strefa bezpieczna 66/108).
+// bezpiecznej (ikony „maskable”).
 function svg(mode = 'icon') {
-  const size = 512, pad = { icon: 56, full: 110, fg: 150 }[mode], gap = mode === 'icon' ? 18 : 14;
+  const size = 512, pad = { icon: 56, full: 110 }[mode], gap = mode === 'icon' ? 18 : 14;
   const cell = (size - 2 * pad - 4 * gap) / 5, r = cell / 2;
   let lamps = '';
   for (let row = 1; row <= 5; row++) {
@@ -57,26 +55,4 @@ for (const [name, px] of [['favicon-32.png', 32], ['icon-180.png', 180], ['icon-
 }
 await png('icons/icon-maskable-512.png', 512, svg('full'));
 
-// Android: ikony starego typu (48 dp) i pierwszy plan ikony adaptacyjnej (108 dp).
-const res = 'android/app/src/main/res';
-if (existsSync(res)) {
-  for (const [dpi, k] of [['mdpi', 1], ['hdpi', 1.5], ['xhdpi', 2], ['xxhdpi', 3], ['xxxhdpi', 4]]) {
-    const dir = `${res}/mipmap-${dpi}`;
-    await png(`${dir}/ic_launcher.png`, 48 * k, svg('full'));
-    await png(`${dir}/ic_launcher_round.png`, 48 * k, svg('full'));
-    await png(`${dir}/ic_launcher_foreground.png`, 108 * k, svg('fg'));
-  }
-  // Ekran startowy (starsze Androidy): ikona na ciemnym tle, w rozmiarach z szablonu.
-  const SPLASH = { '': [480, 320], mdpi: [320, 480], hdpi: [480, 800], xhdpi: [720, 1280],
-    xxhdpi: [960, 1600], xxxhdpi: [1280, 1920] };
-  for (const [dpi, [w, h]] of Object.entries(SPLASH)) {
-    for (const [dir, W, H] of dpi ? [[`drawable-port-${dpi}`, w, h], [`drawable-land-${dpi}`, h, w]] : [['drawable', w, h]]) {
-      const icon = Math.round(Math.min(W, H) * 0.4);
-      await page.setViewportSize({ width: W, height: H });
-      await page.setContent(`<style>html,body{margin:0;height:100%;background:#12151a;display:grid;place-items:center}</style>${source.replace('width="512" height="512"', `width="${icon}" height="${icon}"`)}`);
-      await page.screenshot({ path: `${res}/${dir}/splash.png` });
-      console.log(`${res}/${dir}/splash.png`);
-    }
-  }
-}
 await browser.close();

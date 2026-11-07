@@ -1,7 +1,7 @@
 {
   "name": "swiatelka",
   "productName": "Gra w światełka",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Gra w wygaszanie światełek na planszy 5×5",
   "type": "module",
   "private": true,
@@ -10,7 +10,8 @@
   "homepage": "https://zbludzakowe-zabawy.github.io/swiatelka/",
   "main": "desktop/main.cjs",
   "scripts": {
-    "start": "python3 -m http.server 8000",
+    "start": "node scripts/build-site.js && python3 -m http.server 8000 -d _site",
+    "build": "node scripts/build-site.js",
     "test": "node --test tests/*.test.js",
     "icons": "node scripts/make-icons.js",
     "desktop": "electron .",
@@ -19,16 +20,9 @@
     "dist:win": "electron-builder --win",
     "dist:mac": "electron-builder --mac",
     "dist:linux": "electron-builder --linux",
-    "build:web": "node scripts/build-web.js",
-    "android": "npm run build:web && cap sync android",
-    "android:open": "cap open android",
-    "test:android": "node --test tests-apps/android.test.js",
     "test:web": "node --test tests-apps/web.test.js"
   },
   "devDependencies": {
-    "@capacitor/android": "^8.5.3",
-    "@capacitor/cli": "^8.5.3",
-    "@capacitor/core": "^8.5.3",
     "electron": "45.2.3",
     "electron-builder": "26.0.12",
     "playwright": "^1.63.0"

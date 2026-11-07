@@ -7,11 +7,8 @@ const read = f => readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
 const pkg = JSON.parse(read('package.json'));
 const release = read('.github/workflows/release.yml');
 
-test('wersja w package.json ma postać X.Y.Z (z niej powstaje versionCode Androida)', () => {
-  const m = pkg.version.match(/^(\d+)\.(\d+)\.(\d+)$/);
-  assert.ok(m, pkg.version);
-  assert.ok(Number(m[2]) < 100 && Number(m[3]) < 100, 'minor i patch muszą być < 100');
-  assert.match(read('android/app/build.gradle'), /versionName appVersion/);
+test('wersja w package.json ma postać X.Y.Z (z niej powstaje tag wydania vX.Y.Z)', () => {
+  assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
 });
 
 test('wydanie zawiera pliki wszystkich systemów', () => {
@@ -21,16 +18,16 @@ test('wydanie zawiera pliki wszystkich systemów', () => {
     assert.match(cfg.artifactName, /\.\$\{ext\}$/);
     assert.ok(release.includes(`dist/*.${ext}`), `brak dist/*.${ext} w release.yml`);
   }
-  assert.ok(release.includes('dist/*.apk'));
-  assert.match(read('.github/workflows/android.yml'), /out\/Swiatelka-android\.apk/);
 });
 
-test('wydanie buduje aplikacje przez workflowy komputera i Androida', () => {
+test('wydanie buduje aplikacje przez workflow komputera', () => {
   assert.match(release, /uses: \.\/\.github\/workflows\/desktop\.yml/);
-  assert.match(release, /uses: \.\/\.github\/workflows\/android\.yml/);
-  for (const f of ['desktop', 'android']) {
-    const wf = read(`.github/workflows/${f}.yml`);
-    assert.match(wf, /workflow_call:/, f);
-    assert.match(wf, /branches-ignore: \[main\]/, `${f}: na main buduje „Wydanie”`);
-  }
+  const wf = read('.github/workflows/desktop.yml');
+  assert.match(wf, /workflow_call:/);
+  assert.match(wf, /branches-ignore: \[main\]/, 'na main buduje „Wydanie”');
+});
+
+test('nie ma już aplikacji na Androida (APK) — telefon instaluje grę ze strony (PWA)', () => {
+  assert.doesNotMatch(release, /\.apk|android\.yml/);
+  assert.equal(pkg.devDependencies['@capacitor/core'], undefined);
 });

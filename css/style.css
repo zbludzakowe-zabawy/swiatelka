@@ -14,12 +14,11 @@
   --f-body: "IBM Plex Sans", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   color-scheme: dark;
-  /* Marginesy pod paskiem stanu / wycięciem ekranu: aplikacja na Androida podaje je
-     w zmiennych --safe-area-inset-*, przeglądarki (np. iPhone) przez env(). */
-  --sa-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
-  --sa-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
-  --sa-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
-  --sa-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+  /* Marginesy pod paskiem stanu / wycięciem ekranu (np. iPhone, aplikacja na pełnym ekranie). */
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-right: env(safe-area-inset-right, 0px);
+  --sa-bottom: env(safe-area-inset-bottom, 0px);
+  --sa-left: env(safe-area-inset-left, 0px);
 }
 html, body { height: 100%; }
 body {
@@ -106,15 +105,17 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 .install-text > b { font-family: var(--f-display); font-size: 1rem; color: var(--fg); }
 .install-text span b { color: var(--fg); font-weight: 500; }
 .install .share { vertical-align: -3px; color: var(--fg); }
-.install a.btn {
+.install .btn {
   flex: none; text-decoration: none; font: 500 .95rem var(--f-body); padding: 10px 16px;
-  border-radius: 8px; background: var(--lamp-on); color: #2a1d00;
+  border: 0; border-radius: 8px; background: var(--lamp-on); color: #2a1d00; cursor: pointer;
 }
+.install .btn.secondary { background: transparent; color: var(--muted); padding: 10px 8px; }
+.install-actions { flex: none; display: flex; gap: 4px; }
 .install-close {
   flex: none; align-self: flex-start; width: 32px; height: 32px; margin: -6px -6px 0 0;
   border: 0; border-radius: 8px; background: transparent; color: var(--muted);
   font-size: 1.4rem; line-height: 1; cursor: pointer;
 }
-.install a.btn:focus-visible, .install-close:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.install .btn:focus-visible, .install-close:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 /* Miejsce pod paskiem, żeby nie zasłaniał przycisków gry. */
 body.has-install { padding-bottom: calc(120px + var(--sa-bottom)); }

@@ -31,10 +31,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Przygotuj pliki strony
-        run: |
-          mkdir _site
-          cp -r index.html manifest.webmanifest sw.js css src icons fonts _site/
+      - name: Przygotuj pliki strony (z wersją w sw.js)
+        run: node scripts/build-site.js _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - id: deployment

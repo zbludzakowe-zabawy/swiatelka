@@ -1,7 +1,10 @@
-// Service worker: zapisuje pliki gry w pamięci przeglądarki, żeby wersja z przeglądarki
-// (także „zainstalowana” jako aplikacja) działała bez internetu.
-// Po zmianie któregoś pliku zwiększ numer wersji, by gracze dostali nowe pliki.
-const CACHE = 'swiatelka-v3';
+// Service worker: zapisuje pliki gry w pamięci przeglądarki, żeby gra z przeglądarki
+// (także zainstalowana jako aplikacja) działała bez internetu.
+// VERSION podmienia przy publikacji scripts/build-site.js (skrót zawartości wszystkich plików),
+// więc każda zmiana gry to nowa wersja. Nowa wersja czeka, aż gracz stuknie „Odśwież”
+// w pasku „Dostępna nowa wersja” albo uruchomi grę ponownie.
+const VERSION = 'dev';
+const CACHE = `swiatelka-${VERSION}`;
 const FILES = [
   './',
   'index.html',
@@ -14,7 +17,7 @@ const FILES = [
   'src/board.js',
   'src/colors.js',
   'src/messages.js',
-  'src/install.js',
+  'src/pwa.js',
   'icons/icon.svg',
   'icons/favicon-32.png',
   'icons/icon-180.png',
@@ -34,27 +37,37 @@ const FILES = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache: 'reload' omija pamięć HTTP, żeby nowa wersja nie zapisała starych plików.
+  event.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('swiatelka-') && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
 
-// Najpierw sieć (świeże pliki), a bez internetu — kopia z pamięci.
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data?.type === 'GET_VERSION') event.ports[0]?.postMessage(VERSION);
+});
+
+// Pliki tej wersji z pamięci (działa bez internetu); otwarcie strony pod innym adresem
+// w zakresie gry dostaje zapamiętaną stronę główną.
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
   event.respondWith(
-    fetch(request)
-      .then(res => {
-        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(request, copy)); }
-        return res;
-      })
-      .catch(() => caches.match(request, { ignoreSearch: true })),
+    caches.open(CACHE).then(async cache => {
+      const hit = await cache.match(request, { ignoreSearch: true });
+      if (hit) return hit;
+      if (request.mode === 'navigate') {
+        const shell = await cache.match('./');
+        if (shell) return shell;
+      }
+      return fetch(request);
+    }),
   );
 });
