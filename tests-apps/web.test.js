@@ -155,3 +155,64 @@ test('nowa wersja: pasek „Dostępna nowa wersja”, Odśwież włącza ją od 
   assert.ok(await page.isHidden('#update'));
   await ctx.close();
 });
+
+const GAME_URL = 'https://zbludzakowe-zabawy.github.io/swiatelka/';
+
+test('telefon: „Udostępnij” otwiera okno udostępniania ze stałym adresem gry', async () => {
+  const ctx = await browser.newContext({ ...devices['Pixel 7'], deviceScaleFactor: 1 });
+  await ctx.addInitScript(() => {
+    navigator.share = async data => { window.__shared = data; };
+  });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.goto(base);
+  await page.waitForSelector('#board .tile');
+
+  const box = page.locator('.share-box');
+  await box.scrollIntoViewIfNeeded();
+  assert.equal(await page.getAttribute('.share-url', 'href'), GAME_URL);
+  assert.match(await page.textContent('.share-url'), /zbludzakowe-zabawy\.github\.io\/swiatelka/);
+  // Nic nie wystaje poza ekran telefonu.
+  const fits = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  assert.ok(fits, 'strona szersza niż ekran');
+  if (process.env.SCREENSHOT_DIR) await box.screenshot({ path: `${process.env.SCREENSHOT_DIR}/share-phone.png` });
+
+  await page.click('[data-share]');
+  const shared = await page.evaluate(() => window.__shared);
+  assert.equal(shared.url, GAME_URL, 'udostępnia adres opublikowanej gry, nie adres testowy');
+  assert.ok(shared.title && shared.text);
+  assert.ok(await page.isHidden('#toast'));
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('komputer: „Udostępnij” kopiuje link i pokazuje komunikat', async () => {
+  const ctx = await browser.newContext({ ...devices['Desktop Chrome'], deviceScaleFactor: 1 });
+  await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: base });
+  await ctx.addInitScript(() => { delete Navigator.prototype.share; });
+  const page = await ctx.newPage();
+  await page.goto(base);
+  await page.waitForSelector('#board .tile');
+  assert.equal(await page.evaluate(() => typeof navigator.share), 'undefined');
+
+  await page.click('[data-share]');
+  await page.waitForSelector('#toast', { state: 'visible' });
+  assert.match(await page.textContent('#toast'), /Skopiowano link/);
+  assert.equal(await page.evaluate(() => navigator.clipboard.readText()), GAME_URL);
+  if (process.env.SCREENSHOT_DIR) await page.screenshot({ path: `${process.env.SCREENSHOT_DIR}/share-desktop.png` });
+  await page.waitForSelector('#toast', { state: 'hidden', timeout: 6000 });
+  await ctx.close();
+});
+
+test('iPhone: pasek instalacji nie zasłania dołu strony (np. przycisku „Udostępnij”)', async () => {
+  const { ctx, page } = await open('iPhone SE');
+  await page.waitForSelector('#install', { state: 'visible' });
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  const btn = await page.locator('[data-share]').boundingBox();
+  const bar = await page.locator('#install').boundingBox();
+  assert.ok(btn.y + btn.height <= bar.y, `pasek zasłania „Udostępnij” (${btn.y + btn.height} > ${bar.y})`);
+  if (process.env.SCREENSHOT_DIR) await page.screenshot({ path: `${process.env.SCREENSHOT_DIR}/share-iphone-bottom.png` });
+  await ctx.close();
+});

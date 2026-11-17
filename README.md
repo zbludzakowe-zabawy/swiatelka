@@ -54,6 +54,11 @@ Gra dostaje własną ikonę, otwiera się na pełnym ekranie i po pierwszym otwa
 *Dostępna nowa wersja* — **Odśwież** włącza ją od razu, **Później** zostawia obecną
 (nowa włączy się sama przy następnym uruchomieniu gry).
 
+**Udostępnianie:** zainstalowana gra nie ma paska adresu, więc na dole planszy jest ramka
+*Zaproś innych* z adresem gry i przyciskiem **📤 Udostępnij**. Na telefonie otwiera on
+systemowe okno udostępniania (Messenger, SMS, WhatsApp…), a na komputerze kopiuje link
+do schowka. Zawsze udostępniany jest adres <https://zbludzakowe-zabawy.github.io/swiatelka/>.
+
 ## Jak grać
 
 1. Na planszy 5×5 część lampek świeci.
@@ -121,7 +126,7 @@ npm run test:desktop
 
 Test strony w przeglądarce (`npm run test:web`) emuluje Androida, iPhone’a i komputer:
 sprawdza propozycję instalacji (przycisk *Zainstaluj*, podpowiedź dla iPhone’a, „Nie teraz”),
-grę bez internetu i pasek *Dostępna nowa wersja*.
+grę bez internetu, pasek *Dostępna nowa wersja* i przycisk *Udostępnij*.
 
 ## Struktura projektu
 
@@ -134,6 +139,7 @@ src/colors.js         kolory światełek dla kolejnych plansz
 src/messages.js       komunikaty dla gracza
 src/ui.js             obsługa widoku (DOM)
 src/pwa.js            instalacja gry ze strony (PWA) i pasek „Dostępna nowa wersja”
+src/share.js          przycisk „Udostępnij” (adres gry dla znajomych)
 src/main.js           punkt startowy
 tests/                testy (node:test)
 sw.js                 service worker — gra w przeglądarce działa bez internetu
