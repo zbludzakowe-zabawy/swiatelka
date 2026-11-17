@@ -55,7 +55,7 @@ Gra dostaje własną ikonę, otwiera się na pełnym ekranie i po pierwszym otwa
 (nowa włączy się sama przy następnym uruchomieniu gry).
 
 **Udostępnianie:** zainstalowana gra nie ma paska adresu, więc na dole planszy jest ramka
-*Zaproś innych* z adresem gry i przyciskiem **📤 Udostępnij**. Na telefonie otwiera on
+*Zaproś innych* z adresem gry i przyciskiem **Udostępnij** (ikona trzech połączonych kropek). Na telefonie otwiera on
 systemowe okno udostępniania (Messenger, SMS, WhatsApp…), a na komputerze kopiuje link
 do schowka. Zawsze udostępniany jest adres <https://zbludzakowe-zabawy.github.io/swiatelka/>.
 

@@ -131,6 +131,8 @@ body.has-install { padding-bottom: calc(120px + var(--sa-bottom)); }
 .share-url { color: var(--fg); font-weight: 500; overflow-wrap: anywhere; text-decoration-color: var(--line); }
 .share-url:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; border-radius: 2px; }
 .share-box button.btn { flex: 0 0 auto; }
+.share-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.share-icon { flex: none; }
 /* Komunikat „Skopiowano link” */
 .toast {
   position: fixed; z-index: 20; left: 0; right: 0; margin: 0 auto;
