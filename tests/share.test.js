@@ -13,8 +13,7 @@ test('udostępnia stały adres opublikowanej gry', () => {
   assert.equal(SHARE_URL, 'https://zbludzakowe-zabawy.github.io/swiatelka/');
   assert.equal(SHARE.url, SHARE_URL);
   assert.ok(SHARE.title && SHARE.text);
-  // Ten sam adres widać pod przyciskiem i jest w README.
-  assert.ok(readFileSync(new URL('../index.html', import.meta.url), 'utf8').includes(`href="${SHARE_URL}"`));
+  // Ten sam adres jest w README.
   assert.ok(readFileSync(new URL('../README.md', import.meta.url), 'utf8').includes(SHARE_URL));
 });
 

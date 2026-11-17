@@ -170,14 +170,20 @@ test('telefon: „Udostępnij” otwiera okno udostępniania ze stałym adresem 
   await page.goto(base);
   await page.waitForSelector('#board .tile');
 
-  const box = page.locator('.share-box');
-  await box.scrollIntoViewIfNeeded();
-  assert.equal(await page.getAttribute('.share-url', 'href'), GAME_URL);
-  assert.match(await page.textContent('.share-url'), /zbludzakowe-zabawy\.github\.io\/swiatelka/);
+  // Mała ikona bez podpisu i bez widocznego adresu, w prawym dolnym rogu panelu.
+  const btn = page.locator('[data-share]');
+  await btn.scrollIntoViewIfNeeded();
+  assert.equal(await page.getAttribute('[data-share]', 'aria-label'), 'Udostępnij grę');
+  assert.equal((await btn.textContent()).trim(), '');
+  assert.equal(await page.locator('.share-url, .share-box').count(), 0);
+  const b = await btn.boundingBox(), panel = await page.locator('.panel').boundingBox();
+  assert.ok(b.width <= 40 && b.height <= 40, 'przycisk ma być mały');
+  assert.ok(b.x + b.width > panel.x + panel.width - 40, 'przycisk w prawym rogu');
+  assert.ok(b.y + b.height > panel.y + panel.height - 40, 'przycisk na dole panelu');
   // Nic nie wystaje poza ekran telefonu.
   const fits = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
   assert.ok(fits, 'strona szersza niż ekran');
-  if (process.env.SCREENSHOT_DIR) await box.screenshot({ path: `${process.env.SCREENSHOT_DIR}/share-phone.png` });
+  if (process.env.SCREENSHOT_DIR) await page.locator('.panel').screenshot({ path: `${process.env.SCREENSHOT_DIR}/share-phone.png` });
 
   await page.click('[data-share]');
   const shared = await page.evaluate(() => window.__shared);

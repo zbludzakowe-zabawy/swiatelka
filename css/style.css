@@ -121,18 +121,16 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 /* Miejsce pod paskiem, żeby nie zasłaniał przycisków gry. */
 body.has-install { padding-bottom: calc(120px + var(--sa-bottom)); }
 
-/* Udostępnianie: adres gry i przycisk „Udostępnij” (zainstalowana aplikacja nie ma paska adresu). */
-.share-box {
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 14px;
-  padding: 12px 14px; border-radius: 10px;
-  background: rgba(255, 255, 255, .03); border: 1px solid var(--line);
+/* Udostępnianie: mała, dyskretna ikona w prawym dolnym rogu, obok zasad gry. */
+.foot { display: flex; align-items: flex-end; gap: 8px; }
+.foot .rules { flex: 1; min-width: 0; }
+.share-btn {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin: 0 -6px -6px 0;
+  padding: 0; border: 0; border-radius: 8px; background: transparent;
+  color: var(--muted); opacity: .7; cursor: pointer;
 }
-.share-text { font-size: .85rem; line-height: 1.45; min-width: 0; color: var(--muted); }
-.share-url { color: var(--fg); font-weight: 500; overflow-wrap: anywhere; text-decoration-color: var(--line); }
-.share-url:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; border-radius: 2px; }
-.share-box button.btn { flex: 0 0 auto; }
-.share-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-.share-icon { flex: none; }
+.share-btn:hover, .share-btn:focus-visible { opacity: 1; color: var(--fg); }
+.share-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 0; }
 /* Komunikat „Skopiowano link” */
 .toast {
   position: fixed; z-index: 20; left: 0; right: 0; margin: 0 auto;
