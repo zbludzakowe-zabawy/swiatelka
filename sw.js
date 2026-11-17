@@ -18,6 +18,7 @@ const FILES = [
   'src/colors.js',
   'src/messages.js',
   'src/pwa.js',
+  'src/share.js',
   'icons/icon.svg',
   'icons/favicon-32.png',
   'icons/icon-180.png',

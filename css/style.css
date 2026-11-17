@@ -20,7 +20,8 @@
   --sa-bottom: env(safe-area-inset-bottom, 0px);
   --sa-left: env(safe-area-inset-left, 0px);
 }
-html, body { height: 100%; }
+html { height: 100%; }
+body { min-height: 100%; }
 body {
   margin: 0;
   background: var(--bg); color: var(--fg);
@@ -119,3 +120,25 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 .install .btn:focus-visible, .install-close:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 /* Miejsce pod paskiem, żeby nie zasłaniał przycisków gry. */
 body.has-install { padding-bottom: calc(120px + var(--sa-bottom)); }
+
+/* Udostępnianie: adres gry i przycisk „Udostępnij” (zainstalowana aplikacja nie ma paska adresu). */
+.share-box {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 14px;
+  padding: 12px 14px; border-radius: 10px;
+  background: rgba(255, 255, 255, .03); border: 1px solid var(--line);
+}
+.share-text { font-size: .85rem; line-height: 1.45; min-width: 0; color: var(--muted); }
+.share-url { color: var(--fg); font-weight: 500; overflow-wrap: anywhere; text-decoration-color: var(--line); }
+.share-url:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; border-radius: 2px; }
+.share-box button.btn { flex: 0 0 auto; }
+.share-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.share-icon { flex: none; }
+/* Komunikat „Skopiowano link” */
+.toast {
+  position: fixed; z-index: 20; left: 0; right: 0; margin: 0 auto;
+  bottom: calc(max(16px, var(--sa-bottom)) + 8px);
+  width: max-content; max-width: calc(100% - 32px); box-sizing: border-box;
+  padding: 10px 16px; border-radius: 10px;
+  background: var(--fg); color: var(--bg); font-size: .9rem; text-align: center;
+  overflow-wrap: anywhere; box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+}
