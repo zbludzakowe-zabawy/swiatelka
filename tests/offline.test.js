@@ -14,11 +14,21 @@ const pageFiles = ['index.html', 'manifest.webmanifest', ...list('css'), ...list
 const swFiles = [...read('sw.js').matchAll(/^\s*'([^']+)',$/gm)].map(m => m[1]);
 
 test('strona nie wczytuje niczego z internetu', () => {
-  // Jedyny wyjątek: adres gry do udostępniania (link, strona go nie wczytuje).
+  // Wyjątki: adres gry do udostępniania (link, strona go nie wczytuje) i Google Tag Manager
+  // (wczytywany tylko w przeglądarce i dopiero po zgodzie w banerze – test niżej).
   const GAME_URL = 'https://zbludzakowe-zabawy.github.io/swiatelka/';
+  const GTM_URL = 'https://www.googletagmanager.com/gtm.js?id=';
   for (const f of pageFiles) {
-    assert.doesNotMatch(read(f).replaceAll(GAME_URL, ''), /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\//i, f);
+    assert.doesNotMatch(read(f).replaceAll(GAME_URL, '').replaceAll(GTM_URL, ''),
+      /(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\//i, f);
   }
+});
+
+test('Google Tag Manager: tylko po zgodzie i nie w aplikacji na komputer', () => {
+  const html = read('index.html');
+  assert.doesNotMatch(html, /<script[^>]+src="https?:/i, 'skrypt z internetu wczytywany od razu');
+  assert.match(html, /if \(!\/\^https\?:\$\/\.test\(location\.protocol\)\) return;/);
+  assert.match(html, /c === 'granted'\) load\(\)/);
 });
 
 test('wszystkie pliki, do których odwołuje się strona, istnieją', () => {

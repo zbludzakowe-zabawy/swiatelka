@@ -20,6 +20,8 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     (function () {
+      // Aplikacja na komputer (app://) działa bez internetu – bez statystyk i bez baneru.
+      if (!/^https?:$/.test(location.protocol)) return;
       var KEY = 'zz-analytics-consent', GTM = 'GTM-PKVQBH86';
       var get = function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
       var set = function (v) { try { localStorage.setItem(KEY, v); } catch (e) {} };
