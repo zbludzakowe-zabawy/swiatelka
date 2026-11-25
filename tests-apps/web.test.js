@@ -17,7 +17,7 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
 // Wersja w sw.js — test zmienia ją, udając publikację nowej wersji gry.
 let swVersion = 'test-1';
 
-let server, base, browser;
+let server, base, browser, newContextRaw;
 before(async () => {
   server = createServer(async (req, res) => {
     const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
@@ -33,6 +33,13 @@ before(async () => {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   base = `http://localhost:${server.address().port}/`;
   browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+  // Baner zgody na statystyki zasłania dół ekranu – w pozostałych testach odpowiedź „nie” jest już zapisana.
+  newContextRaw = browser.newContext.bind(browser);
+  browser.newContext = async opts => {
+    const ctx = await newContextRaw(opts);
+    await ctx.addInitScript(() => { try { localStorage.setItem('zz-analytics-consent', 'denied'); } catch {} });
+    return ctx;
+  };
 });
 after(async () => { await browser?.close(); server?.close(); });
 
@@ -220,5 +227,29 @@ test('iPhone: pasek instalacji nie zasłania dołu strony (np. przycisku „Udos
   const bar = await page.locator('#install').boundingBox();
   assert.ok(btn.y + btn.height <= bar.y, `pasek zasłania „Udostępnij” (${btn.y + btn.height} > ${bar.y})`);
   if (process.env.SCREENSHOT_DIR) await page.screenshot({ path: `${process.env.SCREENSHOT_DIR}/share-iphone-bottom.png` });
+  await ctx.close();
+});
+
+test('baner zgody: Google Tag Manager dopiero po „Zgadzam się”', async () => {
+  const ctx = await newContextRaw({ ...devices['Pixel 7'], deviceScaleFactor: 1, locale: 'pl-PL' });
+  const gtm = [];
+  await ctx.route('https://www.googletagmanager.com/**', r => { gtm.push(r.request().url()); r.fulfill({ body: '', contentType: 'text/javascript' }); });
+  const page = await ctx.newPage();
+  await page.goto(base);
+  await page.waitForSelector('#zz-consent', { state: 'visible' });
+  assert.equal(await page.textContent('#zz-consent .zz-ok'), 'Zgadzam się');
+  assert.equal(gtm.length, 0, 'przed zgodą nic nie idzie do Google');
+
+  await page.click('#zz-consent .zz-no');
+  assert.ok(await page.isHidden('#zz-consent'));
+  await page.reload(); await page.waitForSelector('#board .tile'); await page.waitForTimeout(300);
+  assert.ok(await page.isHidden('#zz-consent'), 'odmowa zapamiętana');
+  assert.equal(gtm.length, 0, 'po odmowie nic nie idzie do Google');
+
+  await page.evaluate(() => window.zzConsent());
+  await page.click('#zz-consent .zz-ok');
+  await page.waitForTimeout(300);
+  assert.equal(gtm.length, 1);
+  assert.match(gtm[0], /gtm\.js\?id=GTM-PKVQBH86/);
   await ctx.close();
 });
